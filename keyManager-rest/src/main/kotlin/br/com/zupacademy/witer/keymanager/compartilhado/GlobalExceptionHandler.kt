@@ -25,8 +25,8 @@ class GlobalExceptionHandler : ExceptionHandler<StatusRuntimeException, HttpResp
                 Pair(HttpStatus.NOT_FOUND, statusDescription)
             }
             Status.INVALID_ARGUMENT.code -> {
-                logger.error("Dados da requisição estão inválidos")
-                Pair(HttpStatus.BAD_REQUEST, "Dados da requisição estão inválidos")
+                logger.error("Dados da requisição estão inválidos.")
+                Pair(HttpStatus.BAD_REQUEST, "Dados da requisição estão inválidos.")
             }
             Status.ALREADY_EXISTS.code -> {
                 logger.error("$statusDescription")
