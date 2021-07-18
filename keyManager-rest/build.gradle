@@ -15,6 +15,7 @@ repositories {
 }
 
 micronaut {
+    runtime("netty")
     testRuntime("junit5")
     processing {
         incremental(true)
@@ -32,8 +33,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
+    implementation("org.hibernate:hibernate-validator:6.1.6.Final")
 
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation("io.micronaut.grpc:micronaut-grpc-client-runtime")
 
     testImplementation("io.micronaut:micronaut-http-client")
 

@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zupacademy.witer";
+option java_outer_classname = "KeyManagerGRPC";
+option objc_class_prefix = "HLW";
+
+package br.com.zupacademy.witer;
+import "google/protobuf/timestamp.proto";
+
+service  KeyManagerRegistraGRPCService{
+  rpc registra(RegistraChavePixRequest) returns (RegistraChavePixResponse){}
+}
+
+service KeyManagerRemoveGRPCService{
+  rpc remove(RemoveChavePixRequest) returns (RemoveChavePixResponse){}
+}
+
+service KeyManagerCarregaGRPCService{
+  rpc carrega(CarregaChavePixRequest) returns (CarregaChavePixResponse){}
+}
+
+service KeyManagerListaGRPCService{
+  rpc lista(ListaChavePixRequest) returns (ListaChavePixResponse){}
+}
+//    Identificador do cliente deve ser obrigatório:
+//
+//    Código interno do cliente na Instituição Financeira existente no Sistema ERP do Itaú;
+//    Tipo da chave deve ser obrigatório, e pode ser:
+//
+//    CPF;
+//    telefone celular;
+//    email;
+//    chave aleatória;
+//    Valor da chave deve ser válido e único com tamanho máximo de 77 caracteres:
+//
+//    Quando tipo for CPF, deve ser obrigatório e usar formato ^[0-9]{11}$ (por exemplo: 12345678901);
+//    Quando tipo for telefone celular, deve ser obrigatório e usar formato ^\+[1-9][0-9]\d{1,14}$ (por exemplo: +5585988714077);
+//    Quando tipo for email, deve ser obrigatório e um endereço válido;
+//    Quando tipo for chave aleatória, o valor da chave não deve ser preenchido pois o mesmo deve ser gerado pelo sistema no formato UUID;
+//
+//    Tipo de conta associada a chave Pix deve ser obrigatória, e pode ser:
+//
+//    Conta Corrente;
+//    Conta Poupança;
+message RegistraChavePixRequest {
+  string clienteId = 1;
+  TipoChave tipoChave = 2;
+  string chave = 3;
+  TipoConta tipoConta = 4;
+}
+
+//deve-se retornar um ID interno ("Pix ID") para representar a chave Pix criada pelo sistema;
+message RegistraChavePixResponse {
+  string clienteId = 1;
+  string chavePixId = 2;
+}
+
+//    Tipo da chave deve ser obrigatório, e pode ser:
+//    CPF;
+//    telefone celular;
+//    email;
+//    chave aleatória;
+//    Valor da chave deve ser válido e único com tamanho máximo de 77 caracteres:
+enum TipoChave{
+  TIPO_CHAVE_DESCONHECIDA = 0;
+  CPF = 1;
+  EMAIL = 2;
+  CELULAR = 3;
+  ALEATORIA = 4;
+}
+
+//    Tipo de conta associada a chave Pix deve ser obrigatória, e pode ser:
+//
+//    Conta Corrente;
+//    Conta Poupança;
+enum TipoConta {
+  TIPO_CONTA_DESCONHECIDA = 0;
+  CONTA_CORRENTE = 1;
+  CONTA_POUPANCA = 2;
+}
+
+
+//    Para excluir uma chave Pix, precisamos que o usuário informe os seguintes dados:
+//
+//    Pix ID (identificador interno da chave Pix) deve ser obrigatório;
+//
+//    Identificador do cliente deve ser obrigatório:
+//
+//    Código interno do cliente na Instituição Financeira existente no Sistema ERP do Itaú;
+//    A chave pode ser removida somente pelo seu dono (cliente).
+message RemoveChavePixRequest{
+  string clienteId = 1;
+  string chavePixId = 2;
+}
+
+message RemoveChavePixResponse{
+  string clienteId = 1;
+  string chavePixId = 2;
+}
+
+
+//    Poderemos consultar uma chave Pix de duas maneiras diferentes. Portanto, devemos suportar as seguintes abordagens:
+//
+//    1-Para o nosso sistema KeyManager:
+//    Identificador do cliente e Pix ID devem ser obrigatórios;
+//    a chave Pix encontrada deve ser de propriedade do cliente;
+//    Caso a chave Pix não esteja devidamente registrada no BCB, a mesma não poderá ter suas informações disponibilizadas abertamente, afinal trata-se de uma chave ainda inválida.
+//
+//    2-Para outros microsserviços e sistemas:
+//    Chave Pix deve ser obrigatória e possuir tamanho máximo de 77 caracteres;
+//    No caso de nosso sistema não possuir a chave Pix informada, a mesma deve ser consultada no sistema Pix do BCB.
+//    A ideia é que nosso sistema KeyManager consiga consultar chaves por Pix ID para seus usuários enquanto outros sistemas e serviços possam consultar os dados de qualquer chave pela própria chave Pix para validação de dados ou mesmo para exibir informações.
+message CarregaChavePixRequest{
+  message FiltroPorPixEClienteId{
+    string clienteId = 1;
+    string pixId = 2;
+  }
+
+  oneof filtro{
+    FiltroPorPixEClienteId pixEClienteId = 1;
+    string chave = 2;
+  }
+}
+
+//    Resultado Esperado
+//    Em caso de sucesso, deve-se retornar os dados da chave Pix:
+//
+//    Pix ID (opcional - necessário somente para abordagem 1);
+//    Identificador do cliente (opcional - necessário somente para abordagem 1);
+//    Tipo da chave;
+//    Valor da chave;
+//    Nome e CPF do titular da conta;
+//    Dados da conta vinculada a chave Pix:
+//    nome da instituição financeira;
+//    agência, número da conta e tipo da conta (Corrente ou Poupança);
+//    Data/hora de registro ou criação da chave;
+
+message CarregaChavePixResponse{
+
+  string clienteId = 1;
+  string pixId = 2;
+  ChavePix chavePix = 3;
+
+  message ChavePix{
+
+    message ContaInfo {
+      TipoConta tipo = 1;
+      string instituicao = 2;
+      string nomeDoTitular = 3;
+      string cpfDoTitular = 4;
+      string agencia = 5;
+      string numeroDaConta = 6;
+    }
+
+    TipoChave tipo = 1;
+    string chave = 2;
+    ContaInfo conta = 3;
+    google.protobuf.Timestamp criadaEm = 4;
+  }
+}
+
+//    Para listar todas as chaves Pix cadastradas, precisamos que o usuário informe os seguintes dados:
+//
+//    Identificador do cliente deve ser obrigatório:
+//    Código interno do cliente na Instituição Financeira existente no Sistema ERP do Itaú;
+message ListaChavePixRequest{
+  string clienteId = 1;
+}
+
+//    Resultado Esperado
+//    Em caso de sucesso, deve-se todas as chaves Pix com os seguintes dados:
+//
+//    Pix ID;
+//    Identificador do cliente;
+//    Tipo da chave;
+//    Valor da chave;
+//    tipo da conta (Corrente ou Poupança);
+//    Data/hora de registro ou criação da chave;
+//    Se nenhuma chave for encontrada deve-se retornar uma coleção vazia;
+//
+//    Em caso de erro, deve-se retornar o erro específico e amigável para o usuário final;
+message ListaChavePixResponse{
+  string clienteId = 1;
+  repeated ChavePix chavesPix = 2;
+
+  message ChavePix {
+    string chavePixId = 1;
+    TipoChave tipoChave = 2;
+    string chave = 3;
+    TipoConta tipoConta = 4;
+    google.protobuf.Timestamp criadaEm = 5;
+  }
+}
