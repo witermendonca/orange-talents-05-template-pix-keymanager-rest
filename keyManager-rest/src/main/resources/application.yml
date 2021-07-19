@@ -5,8 +5,6 @@ micronaut:
     port: ${SERVER_PORT:8080}
 
 grpc:
-  server:
-    port: ${SERVER_PORT:50052}
   client:
     plaintext: true
     max-retry-attempts: 10
