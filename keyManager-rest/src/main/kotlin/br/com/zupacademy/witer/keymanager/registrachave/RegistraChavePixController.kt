@@ -1,24 +1,21 @@
 package br.com.zupacademy.witer.keymanager.registrachave
 
 import br.com.zupacademy.witer.KeyManagerRegistraGRPCServiceGrpc
-import br.com.zupacademy.witer.TipoChave
-import br.com.zupacademy.witer.TipoConta
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.validation.Validated
-import io.micronaut.validation.validator.constraints.EmailValidator
-import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator
 import org.slf4j.LoggerFactory
 import java.util.*
+import javax.inject.Inject
 import javax.validation.Valid
 
 @Validated
 @Controller
 class RegistraChavePixController(
-    private val registraChavePixCliente: KeyManagerRegistraGRPCServiceGrpc.KeyManagerRegistraGRPCServiceBlockingStub,
+    @Inject private val registraChavePixCliente: KeyManagerRegistraGRPCServiceGrpc.KeyManagerRegistraGRPCServiceBlockingStub,
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)

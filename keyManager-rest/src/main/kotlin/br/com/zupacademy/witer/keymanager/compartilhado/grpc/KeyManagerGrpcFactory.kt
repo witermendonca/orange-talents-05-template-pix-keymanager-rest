@@ -1,6 +1,7 @@
 package br.com.zupacademy.witer.keymanager.compartilhado.grpc
 
 import br.com.zupacademy.witer.KeyManagerRegistraGRPCServiceGrpc
+import br.com.zupacademy.witer.KeyManagerRemoveGRPCServiceGrpc
 import io.grpc.ManagedChannel
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
@@ -11,4 +12,7 @@ class KeyManagerGrpcFactory(@GrpcChannel("keyManager") val channel: ManagedChann
 
     @Singleton
     fun registraChavePix() = KeyManagerRegistraGRPCServiceGrpc.newBlockingStub(channel)
+
+    @Singleton
+    fun removeChavePix() = KeyManagerRemoveGRPCServiceGrpc.newBlockingStub(channel)
 }
