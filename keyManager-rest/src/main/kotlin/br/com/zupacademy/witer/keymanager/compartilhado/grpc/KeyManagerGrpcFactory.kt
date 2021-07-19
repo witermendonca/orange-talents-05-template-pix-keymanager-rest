@@ -1,6 +1,7 @@
 package br.com.zupacademy.witer.keymanager.compartilhado.grpc
 
 import br.com.zupacademy.witer.KeyManagerCarregaGRPCServiceGrpc
+import br.com.zupacademy.witer.KeyManagerListaGRPCServiceGrpc
 import br.com.zupacademy.witer.KeyManagerRegistraGRPCServiceGrpc
 import br.com.zupacademy.witer.KeyManagerRemoveGRPCServiceGrpc
 import io.grpc.ManagedChannel
@@ -19,4 +20,7 @@ class KeyManagerGrpcFactory(@GrpcChannel("keyManager") val channel: ManagedChann
 
     @Singleton
     fun carregaInfoChavePix() = KeyManagerCarregaGRPCServiceGrpc.newBlockingStub(channel)
+
+    @Singleton
+    fun listaInfoChavesPix() = KeyManagerListaGRPCServiceGrpc.newBlockingStub(channel)
 }
