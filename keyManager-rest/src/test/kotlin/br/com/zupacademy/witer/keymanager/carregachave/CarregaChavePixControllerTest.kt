@@ -69,6 +69,7 @@ internal class CarregaChavePixControllerTest {
         val request = HttpRequest.GET<Any>("/api/v1/clientes/pix/chave/$chavePix")
         val response = client.toBlocking().exchange(request, Any::class.java)
 
+        //validação
         with(response) {
             assertEquals(HttpStatus.OK, status)
             assertNotNull(body())
